@@ -108,6 +108,7 @@ tags_layout = {
    awful.layout.suit.max,
 }
 
+
 for s = 1, screen.count() do
     -- Each screen has its own tag table.
     tags[s] = {}
@@ -232,21 +233,30 @@ local capi =
 --- Give the focus to a screen, and move pointer.
 -- @param i Relative screen number.
 function nomousefocus(i)
-    local s = awful.util.cycle(capi.screen.count(), i)
-    local c = awful.client.focus.history.get(s, 0)
-    if c then capi.client.focus = c end
-    -- dont move the mouse => xinemara fail otherwise...
-    -- Move the mouse on the screen
-    -- capi.mouse.screen = s
+   local s = awful.util.cycle(capi.screen.count(), i)
+   local c = awful.client.focus.history.get(s, 0)
+   if c then capi.client.focus = c end
+   -- dont move the mouse => xinemara fail otherwise...
+   -- Move the mouse on the screen
+   -- capi.mouse.screen = s
 end
+
+-- function getscreen()
+--    if capi.client then
+--    if awful.client.focus then
+--       return awful.client.focus.screen
+--    end
+--    return mouse.screen
+-- end
+
 -- }}}
 
 
 -- {{{ Key bindings
 globalkeys =
 {
-    key({ modkey,           }, "Left",   awful.tag.viewprev       ),
-    key({ modkey,           }, "Right",  awful.tag.viewnext       ),
+--     key({ modkey,           }, "Left",   awful.tag.viewprev       ),
+--     key({ modkey,           }, "Right",  awful.tag.viewnext       ),
     key({ modkey,           }, "Escape", awful.tag.history.restore),
 
     key({ modkey,           }, "j",
@@ -335,20 +345,22 @@ globalkeys =
     key({ modkey }, "Up", function () nomousefocus(1) end),
     key({ modkey }, "Down", function () nomousefocus(2) end),
 
-    key({ modkey, "Shift" }, "Left",
+    key({ modkey,         }, "Left",
         function ()
            awful.client.focus.byidx(-1);
            if client.focus then
               client.focus:raise()
            end
         end),
-    key({ modkey, "Shift" }, "Right",
+    key({ modkey,         }, "Right",
         function ()
            awful.client.focus.byidx(1);
            if client.focus then
               client.focus:raise()
            end
         end),
+--      key({ modkey, "Shift"   }, "Left",   awful.tag.viewprev       ),
+--      key({ modkey, "Shift"   }, "Right",  awful.tag.viewnext       ),
 
 }
 
@@ -381,7 +393,7 @@ for i = 1, keynumber do
     table.insert(globalkeys,
         key({ modkey }, tagkeys[i],
             function ()
-                local screen = mouse.screen
+                local screen = focusedscreen
                 if tags[screen][i] then
                     awful.tag.viewonly(tags[screen][i])
                 end
@@ -389,7 +401,7 @@ for i = 1, keynumber do
     table.insert(globalkeys,
         key({ modkey, "Control" }, tagkeys[i],
             function ()
-                local screen = mouse.screen
+                local screen = focusedscreen
                 if tags[screen][i] then
                     tags[screen][i].selected = not tags[screen][i].selected
                 end
@@ -411,7 +423,7 @@ for i = 1, keynumber do
     table.insert(globalkeys,
         key({ modkey, "Shift" }, "F" .. i,
             function ()
-                local screen = mouse.screen
+                local screen = focusedscreen
                 if tags[screen][i] then
                     for k, c in pairs(awful.client.getmarked()) do
                         awful.client.movetotag(tags[screen][i], c)
@@ -425,11 +437,15 @@ end
 root.keys(globalkeys)
 -- }}}
 
+-- remember last focused screen
+focusedscreen = mouse.screen
+
 -- {{{ Hooks
 -- Hook function to execute when focusing a client.
 awful.hooks.focus.register(function (c)
     if not awful.client.ismarked(c) then
         c.border_color = beautiful.border_focus
+        focusedscreen = c.screen
     end
 end)
 
@@ -458,6 +474,7 @@ awful.hooks.mouse_enter.register(function (c)
         client.focus = c
     end
 end)
+
 
 -- Hook function to execute when a new client appears.
 awful.hooks.manage.register(function (c, startup)
@@ -540,4 +557,43 @@ end)
 awful.hooks.timer.register(60, function ()
     mytextbox.text = os.date(" %a %b %d, %H:%M ")
 end)
+-- }}}
+
+
+
+
+-- {{{ ctaf function
+function getscreen()
+   return focusedscreen
+--    if capi.client.focus then
+--        return capi.client.focus.screen
+--    end
+--    return mouse.screen
+end
+-- }}}
+
+table.insert(globalkeys,
+             key({ modkey, "Shift"   }, "Left",
+                 function ()
+                    awful.tag.viewidx(-1, getscreen())
+                 end))
+
+table.insert(globalkeys,
+             key({ modkey, "Shift"   }, "Right",
+                 function ()
+                    awful.tag.viewidx(1, getscreen())
+                 end))
+
+-- table.insert(globalkeys,
+--              key({ modkey, "Shift"   }, "Left",
+--                  function ()
+--                     awful.tag.viewprev()
+--                  end)
+--           )
+
+-- table.insert(globalkeys,
+--              key({ modkey, "Shift"   }, "Right",  awful.tag.viewnext       ))
+
+-- Set keys
+root.keys(globalkeys)
 -- }}}
