@@ -88,8 +88,25 @@ use_titlebar = false
 -- Define tags table.
 tags = {}
 
-tags_name   = { "1:main", "2:www", "3:mail", "4:prog", "5:im", "6:float", "7:vnc"}
-tags_layout = {  1      ,  7     ,  7      ,  7      ,  10   ,  10      ,  7  }
+tags_name   = {
+   "1:main",
+   "2:www",
+   "3:mail",
+   "4:prog",
+   "5:im",
+   "6:float",
+   "7:vnc"
+}
+
+tags_layout = {
+   awful.layout.suit.fair,
+   awful.layout.suit.max,
+   awful.layout.suit.max,
+   awful.layout.suit.max,
+   awful.layout.suit.floating,
+   awful.layout.suit.floating,
+   awful.layout.suit.max,
+}
 
 for s = 1, screen.count() do
     -- Each screen has its own tag table.
@@ -100,8 +117,7 @@ for s = 1, screen.count() do
         --tags[s][tagnumber] = tag( { name = tagname, layouts[tags_layout[tagnumber]] } )
         -- Add tags to screen one by one
         tags[s][tagnumber].screen = s
-        awful.layout.set(layouts[1], tags[s][tagnumber])
-        awful.layout.set(layouts[tags_layout[tagnumber]], tags[s][tagnumber])
+        awful.layout.set(tags_layout[tagnumber], tags[s][tagnumber])
     end
     -- I'm sure you want to see at least one tag.
     tags[s][1].selected = true
