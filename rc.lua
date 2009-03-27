@@ -58,8 +58,8 @@ floatapps =
     ["MPlayer"] = true,
     ["pinentry"] = true,
     ["gimp"] = true,
-    ["Pidgin"] = true,
-    ["Gajim"] = true,
+    ["Pidgin"]          = true,
+    ["Gajim"]           = true,
 
     -- by instance
     ["mocp"] = true
@@ -89,7 +89,7 @@ use_titlebar = false
 tags = {}
 
 tags_name   = { "1:main", "2:www", "3:mail", "4:prog", "5:im", "6:float", "7:vnc"}
-tags_layout = {  1      ,  8     ,  8      ,  8      ,  12   ,  12      ,  8  }
+tags_layout = {  1      ,  7     ,  7      ,  7      ,  10   ,  10      ,  7  }
 
 for s = 1, screen.count() do
     -- Each screen has its own tag table.
@@ -101,6 +101,7 @@ for s = 1, screen.count() do
         -- Add tags to screen one by one
         tags[s][tagnumber].screen = s
         awful.layout.set(layouts[1], tags[s][tagnumber])
+        awful.layout.set(layouts[tags_layout[tagnumber]], tags[s][tagnumber])
     end
     -- I'm sure you want to see at least one tag.
     tags[s][1].selected = true
