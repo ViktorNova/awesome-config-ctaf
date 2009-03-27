@@ -12,11 +12,17 @@ theme_path = "/usr/local/share/awesome/themes/default/theme"
 -- Uncommment this for a lighter theme
 -- theme_path = "/usr/local/share/awesome/themes/sky/theme"
 
+home = os.getenv("HOME")
+theme_path = home .. "/.config/awesome/themes/default/theme"
+
 -- Actually load theme
 beautiful.init(theme_path)
 
 -- This is used later as the default terminal and editor to run.
 terminal = "xterm"
+
+terminal = "gnome-terminal"
+
 editor = os.getenv("EDITOR") or "nano"
 editor_cmd = terminal .. " -e " .. editor
 
@@ -52,6 +58,9 @@ floatapps =
     ["MPlayer"] = true,
     ["pinentry"] = true,
     ["gimp"] = true,
+    ["Pidgin"] = true,
+    ["Gajim"] = true,
+
     -- by instance
     ["mocp"] = true
 }
@@ -60,6 +69,13 @@ floatapps =
 -- Use the screen and tags indices.
 apptags =
 {
+  ["Emacs"]             = { screen = 1, tag = 4 },
+  ["Thunderbird"]       = { screen = 1, tag = 3 },
+  ["Navigator"]         = { screen = 1, tag = 2 },
+  ["Epiphany"]          = { screen = 1, tag = 2 },
+  ["Pidgin"]            = { screen = 1, tag = 5 },
+  ["Vncviewer"]         = { screen = 1, tag = 7 },
+
     -- ["Firefox"] = { screen = 1, tag = 2 },
     -- ["mocp"] = { screen = 2, tag = 4 },
 }
@@ -71,12 +87,17 @@ use_titlebar = false
 -- {{{ Tags
 -- Define tags table.
 tags = {}
+
+tags_name   = { "1:main", "2:www", "3:mail", "4:prog", "5:im", "6:float", "7:vnc"}
+tags_layout = {  1      ,  8     ,  8      ,  8      ,  12   ,  12      ,  8  }
+
 for s = 1, screen.count() do
     -- Each screen has its own tag table.
     tags[s] = {}
     -- Create 9 tags per screen.
-    for tagnumber = 1, 9 do
-        tags[s][tagnumber] = tag(tagnumber)
+    for tagnumber, tagname in ipairs(tags_name) do
+        tags[s][tagnumber] = tag( tagname )
+        --tags[s][tagnumber] = tag( { name = tagname, layouts[tags_layout[tagnumber]] } )
         -- Add tags to screen one by one
         tags[s][tagnumber].screen = s
         awful.layout.set(layouts[1], tags[s][tagnumber])
@@ -101,7 +122,12 @@ myawesomemenu = {
 }
 
 mymainmenu = awful.menu.new({ items = { { "awesome", myawesomemenu, beautiful.awesome_icon },
-                                        { "open terminal", terminal }
+                                        { "open terminal", terminal } ,
+                                        { "thunderbird", "thunderbird3" } ,
+                                        { "epiphany", "epiphany" } ,
+                                        { "firefox", "firefox" } ,
+                                        { "halt", "sudo /sbin/halt" },
+                                        { "reboot", "sudo /sbin/reboot" }
                                       }
                             })
 
@@ -406,7 +432,7 @@ awful.hooks.manage.register(function (c, startup)
     -- awful.client.setslave(c)
 
     -- Honor size hints: if you want to drop the gaps between windows, set this to false.
-    -- c.size_hints_honor = false
+    c.size_hints_honor = false
 end)
 
 -- Hook function to execute when arranging the screen.
