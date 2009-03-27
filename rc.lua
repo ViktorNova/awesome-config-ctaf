@@ -206,6 +206,25 @@ root.buttons({
 })
 -- }}}
 
+-- {{{ ctaf function
+local capi =
+{
+    screen = screen,
+    client = client
+}
+--- Give the focus to a screen, and move pointer.
+-- @param i Relative screen number.
+function nomousefocus(i)
+    local s = awful.util.cycle(capi.screen.count(), i)
+    local c = awful.client.focus.history.get(s, 0)
+    if c then capi.client.focus = c end
+    -- dont move the mouse => xinemara fail otherwise...
+    -- Move the mouse on the screen
+    -- capi.mouse.screen = s
+end
+-- }}}
+
+
 -- {{{ Key bindings
 globalkeys =
 {
@@ -269,6 +288,49 @@ globalkeys =
             awful.util.eval, nil,
             awful.util.getdir("cache") .. "/history_eval")
         end),
+
+    key({ modkey }, "F2", function() awful.util.spawn(terminal)                 end),
+    key({ modkey }, "F5", function() awful.util.spawn("nautilus --no-desktop")  end),
+    key({ modkey }, "F6", function() awful.util.spawn("epiphany")               end),
+    key({ modkey }, "F7", function() awful.util.spawn("thunderbird3")           end),
+    key({ modkey }, "F8", function() awful.util.spawn("totem")                  end),
+
+    key({ modkey, "Ctrl" }, "i",
+        function ()
+           local s = mouse.screen
+           if mypromptbox[s].text then
+              mypromptbox[s].text = nil
+           elseif client.focus then
+              mypromptbox[s].text = nil
+              if client.focus.class then
+                 mypromptbox[s].text = "Class: " .. client.focus.class .. " "
+              end
+              if client.focus.instance then
+                 mypromptbox[s].text = mypromptbox[s].text .. "Instance: ".. client.focus.instance .. " "
+              end
+              if client.focus.role then
+                 mypromptbox[s].text = mypromptbox[s].text .. "Role: ".. client.focus.role
+              end
+           end
+        end),
+    key({ modkey }, "Up", function () nomousefocus(1) end),
+    key({ modkey }, "Down", function () nomousefocus(2) end),
+
+    key({ modkey, "Shift" }, "Left",
+        function ()
+           awful.client.focus.byidx(-1);
+           if client.focus then
+              client.focus:raise()
+           end
+        end),
+    key({ modkey, "Shift" }, "Right",
+        function ()
+           awful.client.focus.byidx(1);
+           if client.focus then
+              client.focus:raise()
+           end
+        end),
+
 }
 
 -- Client awful tagging: this is useful to tag some clients and then do stuff like move to tag on them
@@ -294,9 +356,10 @@ for s = 1, screen.count() do
    keynumber = math.min(9, math.max(#tags[s], keynumber));
 end
 
+tagkeys = { '#10', '#11', '#12', '#13', '#14', '#15', '#16', '#17', '#18', '#19', '#20' }
 for i = 1, keynumber do
     table.insert(globalkeys,
-        key({ modkey }, i,
+        key({ modkey }, tagkeys[i],
             function ()
                 local screen = mouse.screen
                 if tags[screen][i] then
@@ -304,7 +367,7 @@ for i = 1, keynumber do
                 end
             end))
     table.insert(globalkeys,
-        key({ modkey, "Control" }, i,
+        key({ modkey, "Control" }, tagkeys[i],
             function ()
                 local screen = mouse.screen
                 if tags[screen][i] then
@@ -312,14 +375,14 @@ for i = 1, keynumber do
                 end
             end))
     table.insert(globalkeys,
-        key({ modkey, "Shift" }, i,
+        key({ modkey, "Shift" }, tagkeys[i],
             function ()
                 if client.focus and tags[client.focus.screen][i] then
                     awful.client.movetotag(tags[client.focus.screen][i])
                 end
             end))
     table.insert(globalkeys,
-        key({ modkey, "Control", "Shift" }, i,
+        key({ modkey, "Control", "Shift" }, tagkeys[i],
             function ()
                 if client.focus and tags[client.focus.screen][i] then
                     awful.client.toggletag(tags[client.focus.screen][i])
