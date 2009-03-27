@@ -296,6 +296,8 @@ globalkeys =
     key({ modkey }, "F7", function() awful.util.spawn("thunderbird3")           end),
     key({ modkey }, "F8", function() awful.util.spawn("totem")                  end),
 
+
+
     key({ modkey, "Ctrl" }, "i",
         function ()
            local s = mouse.screen
@@ -349,6 +351,7 @@ clientkeys =
             c.maximized_horizontal = not c.maximized_horizontal
             c.maximized_vertical   = not c.maximized_vertical
         end),
+    key({ "Mod1",           }, "c",      function (c) c:kill()                         end),
 }
 
 -- Compute the maximum number of digit we need, limited to 9
