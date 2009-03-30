@@ -597,21 +597,23 @@ table.insert(globalkeys,
 
 --scratchpad replacement
 -- simply toggle a tag on/off
-scrachpadactive=false
 table.insert(globalkeys,
              key({ modkey, }, "space",
                  function ()
-                     local tscreen    = 1
-                     local ttag       = 2
-                     if scratchpadactive then
-                         awful.tag.history.restore(tscreen)
-                      else
-                         for i, t in pairs(tags[tscreen]) do
-                             t.selected = false
-                         end
-                         tags[tscreen][ttag].selected = true
-                      end
-                      scratchpadactive = not scratchpadactive
+                    local tscreen    = 1
+                    local ttag       = 2
+
+                    if tags[tscreen][ttag].selected then
+                       -- scratchpad active => load previous tag
+                       awful.tag.history.restore(tscreen)
+                    else
+                       -- unselect each tag, then select scrachpad
+                       for i, t in pairs(tags[tscreen]) do
+                          t.selected = false
+                       end
+                       tags[tscreen][ttag].selected = true
+                    end
+                    scratchpadactive = not scratchpadactive
                  end))
 
 -- Set keys
