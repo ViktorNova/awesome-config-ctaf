@@ -70,7 +70,7 @@ floatapps =
 apptags =
 {
   ["Emacs"]             = { screen = 1, tag = 4 },
-  ["Thunderbird"]       = { screen = 1, tag = 3 },
+  ["Thunderbird"]       = { screen = 1, tag = 2 },
   ["Navigator"]         = { screen = 1, tag = 2 },
   ["Epiphany"]          = { screen = 1, tag = 2 },
   ["Pidgin"]            = { screen = 1, tag = 5 },
@@ -91,7 +91,7 @@ tags = {}
 tags_name   = {
    "1:main",
    "2:www",
-   "3:mail",
+   "3:plop",
    "4:prog",
    "5:im",
    "6:float",
@@ -296,7 +296,7 @@ globalkeys =
     key({ modkey, "Shift"   }, "l",     function () awful.tag.incnmaster(-1)      end),
     key({ modkey, "Control" }, "h",     function () awful.tag.incncol( 1)         end),
     key({ modkey, "Control" }, "l",     function () awful.tag.incncol(-1)         end),
-    key({ modkey,           }, "space", function () awful.layout.inc(layouts,  1) end),
+    key({ modkey, "Control" }, "space", function () awful.layout.inc(layouts,  1) end),
     key({ modkey, "Shift"   }, "space", function () awful.layout.inc(layouts, -1) end),
 
     -- Prompt
@@ -519,6 +519,14 @@ awful.hooks.manage.register(function (c, startup)
     if target then
         c.screen = target.screen
         awful.client.movetotag(tags[target.screen][target.tag], c)
+        -- switch to the selected tag
+        --viewnone(target.screen)
+        --viewonly(target.tag)
+        -- manualy deselect previous tag, then select the target one
+        for i, t in pairs(tags[target.screen]) do
+           t.selected = false
+        end
+        tags[target.screen][target.tag].selected = true
     end
 
     -- Do this after tag mapping, so you don't see it on the wrong tag for a split second.
@@ -570,6 +578,9 @@ function getscreen()
 --    end
 --    return mouse.screen
 end
+
+
+
 -- }}}
 
 table.insert(globalkeys,
@@ -584,15 +595,24 @@ table.insert(globalkeys,
                     awful.tag.viewidx(1, getscreen())
                  end))
 
--- table.insert(globalkeys,
---              key({ modkey, "Shift"   }, "Left",
---                  function ()
---                     awful.tag.viewprev()
---                  end)
---           )
-
--- table.insert(globalkeys,
---              key({ modkey, "Shift"   }, "Right",  awful.tag.viewnext       ))
+--scratchpad replacement
+-- simply toggle a tag on/off
+scrachpadactive=false
+table.insert(globalkeys,
+             key({ modkey, }, "space",
+                 function ()
+                     local tscreen    = 1
+                     local ttag       = 2
+                     if scratchpadactive then
+                         awful.tag.history.restore(tscreen)
+                      else
+                         for i, t in pairs(tags[tscreen]) do
+                             t.selected = false
+                         end
+                         tags[tscreen][ttag].selected = true
+                      end
+                      scratchpadactive = not scratchpadactive
+                 end))
 
 -- Set keys
 root.keys(globalkeys)
