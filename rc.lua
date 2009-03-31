@@ -55,14 +55,15 @@ layouts =
 floatapps =
 {
     -- by class
-    ["MPlayer"] = true,
-    ["pinentry"] = true,
-    ["gimp"] = true,
+    ["MPlayer"]         = true,
+    ["pinentry"]        = true,
+    ["gimp"]            = true,
     ["Pidgin"]          = true,
     ["Gajim"]           = true,
+    ["Gcalctool"]       = true,
 
     -- by instance
-    ["mocp"] = true
+    ["mocp"]            = true
 }
 
 -- Applications to be moved to a pre-defined tag by class or instance.
@@ -71,6 +72,7 @@ apptags =
 {
   ["Emacs"]             = { screen = 1, tag = 4 },
   ["git-gui"]           = { screen = 1, tag = 4 },
+  ["gitk"]              = { screen = 1, tag = 4 },
   ["Thunderbird"]       = { screen = 1, tag = 2 },
   ["Navigator"]         = { screen = 1, tag = 2 },
   ["Epiphany"]          = { screen = 1, tag = 2 },
