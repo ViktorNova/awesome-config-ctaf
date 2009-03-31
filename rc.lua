@@ -70,6 +70,7 @@ floatapps =
 apptags =
 {
   ["Emacs"]             = { screen = 1, tag = 4 },
+  ["git-gui"]           = { screen = 1, tag = 4 },
   ["Thunderbird"]       = { screen = 1, tag = 2 },
   ["Navigator"]         = { screen = 1, tag = 2 },
   ["Epiphany"]          = { screen = 1, tag = 2 },
@@ -232,7 +233,7 @@ local capi =
 }
 --- Give the focus to a screen, and move pointer.
 -- @param i Relative screen number.
-function nomousefocus(i)
+function noMouseFocusScreen(i)
    local s = awful.util.cycle(capi.screen.count(), i)
    local c = awful.client.focus.history.get(s, 0)
    if c then capi.client.focus = c end
@@ -241,13 +242,32 @@ function nomousefocus(i)
    -- capi.mouse.screen = s
 end
 
--- function getscreen()
---    if capi.client then
---    if awful.client.focus then
---       return awful.client.focus.screen
+function getScreen()
+   return focusedscreen
+--    if capi.client.focus then
+--        return capi.client.focus.screen
 --    end
 --    return mouse.screen
--- end
+end
+
+-- scratchpad replacement
+-- specify a screen and a tag and it will act like ion scratchpad
+-- TODO check if we are on the good screen too
+function toggleScratchPad(tag, screen)
+   local thescreen = screen or mouse.screen
+   if tags[thescreen][tag].selected then
+      -- scratchpad active => load previous tag
+      awful.tag.history.restore(thescreen)
+   else
+      noMouseFocusScreen(thescreen)
+      -- unselect each tag, then select scrachpad
+      for i, t in pairs(tags[thescreen]) do
+         t.selected = false
+      end
+      tags[thescreen][tag].selected = true
+   end
+end
+
 
 -- }}}
 
@@ -316,12 +336,11 @@ globalkeys =
             awful.util.getdir("cache") .. "/history_eval")
         end),
 
-    key({ modkey }, "F2", function() awful.util.spawn(terminal)                 end),
-    key({ modkey }, "F5", function() awful.util.spawn("nautilus --no-desktop")  end),
-    key({ modkey }, "F6", function() awful.util.spawn("epiphany")               end),
-    key({ modkey }, "F7", function() awful.util.spawn("thunderbird3")           end),
-    key({ modkey }, "F8", function() awful.util.spawn("totem")                  end),
-
+    key({ modkey }, "F2", function() awful.util.spawn(terminal, getScreen())                 end),
+    key({ modkey }, "F5", function() awful.util.spawn("nautilus --no-desktop", getScreen())  end),
+    key({ modkey }, "F6", function() awful.util.spawn("epiphany", getScreen())               end),
+    key({ modkey }, "F7", function() awful.util.spawn("thunderbird3", getScreen())           end),
+    key({ modkey }, "F8", function() awful.util.spawn("totem", getScreen())                  end),
 
 
     key({ modkey, "Ctrl" }, "i",
@@ -342,8 +361,8 @@ globalkeys =
               end
            end
         end),
-    key({ modkey }, "Up", function () nomousefocus(1) end),
-    key({ modkey }, "Down", function () nomousefocus(2) end),
+    key({ modkey }, "Up", function () noMouseFocusScreen(1) end),
+    key({ modkey }, "Down", function () noMouseFocusScreen(2) end),
 
     key({ modkey,         }, "Left",
         function ()
@@ -482,7 +501,8 @@ awful.hooks.manage.register(function (c, startup)
     -- move it to the screen where the mouse is.
     -- We only do it for filtered windows (i.e. no dock, etc).
     if not startup and awful.client.focus.filter(c) then
-        c.screen = mouse.screen
+       --c.screen = mouse.screen
+        c.screen = getScreen()
     end
 
     if use_titlebar then
@@ -568,31 +588,16 @@ end)
 -- }}}
 
 
-
-
--- {{{ ctaf function
-function getscreen()
-   return focusedscreen
---    if capi.client.focus then
---        return capi.client.focus.screen
---    end
---    return mouse.screen
-end
-
-
-
--- }}}
-
 table.insert(globalkeys,
              key({ modkey, "Shift"   }, "Left",
                  function ()
-                    awful.tag.viewidx(-1, getscreen())
+                    awful.tag.viewidx(-1, getScreen())
                  end))
 
 table.insert(globalkeys,
              key({ modkey, "Shift"   }, "Right",
                  function ()
-                    awful.tag.viewidx(1, getscreen())
+                    awful.tag.viewidx(1, getScreen())
                  end))
 
 --scratchpad replacement
@@ -602,18 +607,7 @@ table.insert(globalkeys,
                  function ()
                     local tscreen    = 1
                     local ttag       = 2
-
-                    if tags[tscreen][ttag].selected then
-                       -- scratchpad active => load previous tag
-                       awful.tag.history.restore(tscreen)
-                    else
-                       -- unselect each tag, then select scrachpad
-                       for i, t in pairs(tags[tscreen]) do
-                          t.selected = false
-                       end
-                       tags[tscreen][ttag].selected = true
-                    end
-                    scratchpadactive = not scratchpadactive
+                    toggleScratchPad(ttag, tscreen)
                  end))
 
 -- Set keys
