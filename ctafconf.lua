@@ -32,19 +32,20 @@ end
 -- scratchpad replacement
 -- specify a screen and a tag and it will act like ion scratchpad
 -- TODO check if we are on the good screen too
-function toggle_scratchpad(tag, screen)
-    local thescreen = screen or mouse.screen
-    if tags[thescreen][tag].selected then
+function toggle_scratchpad(tag, tscreen)
+    local cscreen = tscreen or mouse.screen
+    if tags[cscreen][tag].selected then
         -- scratchpad active => load previous tag
-        awful.tag.history.restore(thescreen)
+        awful.tag.history.restore(cscreen)
     else
-        no_mouse_focus_screen(thescreen)
+        no_mouse_focus_screen(cscreen)
         -- unselect each tag, then select scrachpad
-        for i, t in pairs(tags[thescreen]) do
-            t.selected = false
-        end
-        tags[thescreen][tag].selected = true
-    end
+        awful.tag.viewonly(tags[cscreen][tag])
+--         for i, t in pairs(tags[cscreen]) do
+--             t.selected = false
+--         end
+--         tags[thescreen][tag].selected = true
+   end
 end
 
 
