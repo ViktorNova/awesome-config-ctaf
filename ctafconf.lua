@@ -99,4 +99,26 @@ function client_info()
 end
 --}}}
 
+function autotab_start()
+    client.add_signal("manage", function (c, startup)
+        local sel       = client.focus
+        local index     = nil
+        --if the current client is already focused => get prev from history
+        if sel == c then
+            sel = awful.client.focus.history.get(c.screen, 1)
+        end
+        index = awful.tab.client_tabindex(sel)
+        --do nothing on startup
+        -- or floating or dock or not on the same tab as current focus
+        if startup or awful.client.dockable.get(c) or awful.client.floating.get(c) then
+            return
+        end
+        if index ~= nil then
+            -- Currently focused client is tabbed,
+            -- add the new window to the tabbed display
+            awful.tab.add(index, c)
+        end
+    end)
+end
+
 -- }}}
