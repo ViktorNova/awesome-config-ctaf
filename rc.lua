@@ -18,6 +18,10 @@ require("dbg")
 terminal = "xterm"
 -- CTAF
 terminal = "gnome-terminal"
+
+-- Zenburn theme
+beautiful.init("/usr/share/awesome/themes/zenburn/theme.lua")
+
 -- ECTAF
 
 editor = os.getenv("EDITOR") or "nano"
@@ -244,7 +248,10 @@ globalkeys = awful.util.table.join(
     awful.key({ modkey, "Shift"   }, "l",     function () awful.tag.incnmaster(-1)      end),
     awful.key({ modkey, "Control" }, "h",     function () awful.tag.incncol( 1)         end),
     awful.key({ modkey, "Control" }, "l",     function () awful.tag.incncol(-1)         end),
-    awful.key({ modkey,           }, "space", function () awful.layout.inc(layouts,  1) end),
+    -- CTAF
+    -- awful.key({ modkey,           }, "space", function () awful.layout.inc(layouts,  1) end),
+    awful.key({ modkey, "Mod1"    }, "space", function () awful.layout.inc(layouts,  1) end),
+    -- ECTAF
     awful.key({ modkey, "Shift"   }, "space", function () awful.layout.inc(layouts, -1) end),
 
     -- CTAF
@@ -301,7 +308,7 @@ globalkeys = awful.util.table.join(
     awful.key({ modkey, }, "space",
               function ()
                   local tscreen    = 1
-                  local ttag       = 2
+                  local ttag       = 1
                   toggle_scratchpad(ttag, tscreen)
               end),
 
@@ -414,12 +421,19 @@ awful.rules.rules = {
     --   properties = { tag = tags[1][2] } },
 
     -- CTAF
+    -- Tag 1:www
     { rule = { class = "Epiphany-browser" },
       properties = { tag = tags[1][1], switchtotag = true } },
+    { rule = { class = "Epiphany-browser", role = "epiphany-extension-manager" },
+      properties = { floating = true } },
+
     { rule = { class = "Firefox" },
       properties = { tag = tags[1][1], switchtotag = true } },
+    { rule = { class = "Firefox", role = "Manager" },
+      properties = { floating = true } },
 
 
+    -- Tag 4:prog
     { rule = { class = "Emacs" },
       properties = { tag = tags[1][4], switchtotag = true } },
     { rule = { class = "Gitk" },
@@ -427,12 +441,12 @@ awful.rules.rules = {
     { rule = { class = "Git-gui" },
       properties = { tag = tags[1][4], switchtotag = true } },
 
+
+    -- Tag 5:im
     { rule = { class = "Pidgin" },
       properties = { tag = tags[1][5], floating = true, ontop = true } },
     { rule = { name = "Buddy List" },
       properties = { tag = tags[1][5], floating = true, ontop = true } },
---     { rule = { role = "buddy_list" },
---       properties = { tag = tags[1][5], floating = true, ontop = true } }
 
 
     -- ECTAF
@@ -491,6 +505,21 @@ client.add_signal("manage", function (c, startup)
     awful.placement.no_offscreen(c)
     -- ECTAF
 end)
+
+-- CTAF
+-- force client on tag 5 to be floating and ontop
+--client.add_signal("manage", function (c, startup)
+client.add_signal("new", function (c)
+    c:add_signal("tagged", function(c, t)
+        if t == tags[1][5] then
+            c.ontop = true
+            --yeah crappy but need to be set before floating
+            --awful.client.property.set(c, "floating_geometry", c:geometry())
+            awful.client.floating.set(c, true)
+        end
+    end)
+end)
+-- ECTAF
 
 client.add_signal("focus", function(c) c.border_color = beautiful.border_focus end)
 client.add_signal("unfocus", function(c) c.border_color = beautiful.border_normal end)
