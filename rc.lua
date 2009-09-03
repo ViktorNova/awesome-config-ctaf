@@ -60,11 +60,11 @@ tags = {}
 -- CTAF
 tags.settings = {
     { name = "1:www",  layout = awful.layout.suit.max  },
-    { name = "2:term", layout = awful.layout.suit.max  },
-    { name = "3:term", layout = awful.layout.suit.max  },
+    { name = "2:term", layout = awful.layout.suit.fair  },
+    { name = "3:term", layout = awful.layout.suit.fair  },
     { name = "4:prog", layout = awful.layout.suit.max  },
     { name = "5:im",   layout = awful.layout.floating, mwfact = 0.13 },
-    { name = "6:misc", layout = awful.layout.floating, hide = false },
+    { name = "6:misc", layout = awful.layout.suit.max, hide = false },
 }
 
 -- Initialize tags
@@ -238,7 +238,9 @@ globalkeys = awful.util.table.join(
         end),
 
     -- Standard program
-    awful.key({ modkey,           }, "Return", function () awful.util.spawn(terminal) end),
+    -- CTAF
+    --awful.key({ modkey,           }, "Return", function () awful.util.spawn(terminal) end),
+    -- ECTAF
     awful.key({ modkey, "Control" }, "r", awesome.restart),
     awful.key({ modkey, "Shift"   }, "q", awesome.quit),
 
@@ -312,6 +314,9 @@ globalkeys = awful.util.table.join(
                   toggle_scratchpad(ttag, tscreen)
               end),
 
+    -- toggle im on and off
+    awful.key({ modkey,           }, "Return", function () awful.tag.viewtoggle(tags[1][5]) end),
+
     awful.key({ modkey            }, 't',           tag_info, nil, "tag info"),
 
     --- tab manipulation
@@ -352,7 +357,11 @@ clientkeys = awful.util.table.join(
         end),
     -- CTAF
     awful.key({ modkey,           }, "c",      function (c) c:kill()                         end),
-    awful.key({ modkey,           }, "i",      client_info)
+    awful.key({ modkey,           }, "i",      client_info),
+    awful.key({ modkey,           }, "e",      function (c)
+                                                   naughty.notify{text="client " .. c.name .. " marked."}
+                                                   awful.client.mark(c)
+                                               end)
     -- ECTAF
 )
 
@@ -448,6 +457,12 @@ awful.rules.rules = {
     { rule = { name = "Buddy List" },
       properties = { tag = tags[1][5], floating = true, ontop = true } },
 
+    -- Tag 6:misc
+    { rule = { class = "Evince" },
+      properties = { tag = tags[1][6], switchtotag = true } },
+    { rule = { class = "Totem" },
+      properties = { tag = tags[1][6], switchtotag = true } },
+
 
     -- ECTAF
 }
@@ -519,6 +534,9 @@ client.add_signal("new", function (c)
         end
     end)
 end)
+
+autotab_start()
+
 -- ECTAF
 
 client.add_signal("focus", function(c) c.border_color = beautiful.border_focus end)
