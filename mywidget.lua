@@ -73,11 +73,8 @@ memwidget     = awful.widget.graph({ layout = awful.widget.layout.horizontal.rig
 memwidget:set_width(30)
 memwidget:set_scale(false)
 memwidget:set_max_value(100)
---memwidget:set_height(10)
---memwidget:set_vertical(true)
 memwidget:set_background_color(beautiful.fg_off_widget)
 memwidget:set_border_color(beautiful.border_widget)
---memwidget:set_border_color(nil)
 memwidget:set_color(beautiful.fg_end_widget)
 memwidget:set_gradient_colors({
     beautiful.fg_end_widget,

@@ -28,6 +28,8 @@ beautiful.init("/usr/share/awesome/themes/zenburn/theme.lua")
 editor = os.getenv("EDITOR") or "nano"
 editor_cmd = terminal .. " -e " .. editor
 
+
+
 -- Default modkey.
 -- Usually, Mod4 is the key with a logo between Control and Alt.
 -- If you do not like this or do not have such a key,
@@ -89,8 +91,9 @@ end
 -- ECTAF
 -- }}}
 
+-- CTAF
 -- {{{ Menu
--- Create a laucher widget and a main menu
+--Create a laucher widget and a main menu
 myawesomemenu = {
    { "manual", terminal .. " -e man awesome" },
    { "edit config", editor_cmd .. " " .. awful.util.getdir("config") .. "/rc.lua" },
@@ -100,9 +103,13 @@ myawesomemenu = {
 
 mymainmenu = awful.menu({ items = {
                               { "menu", myawesomemenu, beautiful.awesome_icon },
-                                    { "open terminal", terminal }
-                                  }
-                        })
+                              { "open terminal", terminal }
+                          }
+                      })
+
+--require("mymenu")
+
+-- ECTAF
 
 mylauncher = awful.widget.launcher({ image = image(beautiful.awesome_icon),
                                      menu = mymainmenu })
@@ -532,6 +539,9 @@ client.add_signal("manage", function (c, startup)
 --             client.focus = c
 --         end
 --     end)
+
+    --maximize client (dont respect term size)
+    c.size_hints_honor = false
 
     -- Set the windows at the slave,
     -- i.e. put it at the end of others instead of setting it master.
