@@ -91,7 +91,6 @@ end
 -- ECTAF
 -- }}}
 
--- CTAF
 -- {{{ Menu
 --Create a laucher widget and a main menu
 myawesomemenu = {
@@ -107,8 +106,9 @@ mymainmenu = awful.menu({ items = {
                           }
                       })
 
+-- CTAF
+--need to comment the previous code, to enable freedesktop menu
 --require("mymenu")
-
 -- ECTAF
 
 mylauncher = awful.widget.launcher({ image = image(beautiful.awesome_icon),
@@ -296,6 +296,7 @@ globalkeys = awful.util.table.join(
 
     awful.key({ modkey }, "F2", function() awful.util.spawn(terminal, true, get_screen().index)                 end),
     awful.key({ modkey }, "F3", function() teardrop.toggle("gmrun", 1, 0.10) end),
+    awful.key({ modkey }, "d", function() teardrop.toggle("gnome-terminal", 0, 0.50) end),
 
     awful.key({ modkey }, "F4", function ()
                                     awful.prompt.run({ prompt = "Run Lua code: " },
@@ -344,7 +345,7 @@ globalkeys = awful.util.table.join(
               end),
 
     -- toggle im on and off
-    awful.key({ modkey,           }, "Return", function () awful.tag.viewtoggle(tags[1][5]) end),
+    awful.key({ modkey,           }, "Return", function () toggle_scratchpad(5, 1) end),
 
     awful.key({ modkey            }, 't',           tag_info, nil, "tag info"),
 
@@ -449,7 +450,7 @@ awful.rules.rules = {
                      keys = clientkeys,
                      buttons = clientbuttons } },
     { rule = { class = "MPlayer" },
-      properties = { floating = true } },
+      properties = { floating = true, ontop = true } },
     { rule = { class = "pinentry" },
       properties = { floating = true } },
     { rule = { class = "Gimp" },
@@ -458,18 +459,28 @@ awful.rules.rules = {
     -- { rule = { class = "Firefox" },
     --   properties = { tag = tags[1][2] } },
 
+    -- Floating
+    { rule = { name = ".*VLC.*" },
+      properties = { floating = true, above = true } },
+    { rule = { name = "Playlist" },
+      properties = { floating = true, above = true } },
+
+    { rule = { class = "Gedit" },
+      properties = { floating = true, width = 600, height = 600, x = 420, y = 420 } },
+
     -- CTAF
     -- Tag 1:www
     { rule = { class = "Epiphany-browser" },
       properties = { tag = tags[1][1], switchtotag = true } },
     { rule = { class = "Epiphany-browser", role = "epiphany-extension-manager" },
       properties = { floating = true } },
+    { rule = { class = "Epiphany-browser", role = "epiphany-download-manager" },
+      properties = { floating = true } },
 
     { rule = { class = "Firefox" },
       properties = { tag = tags[1][1], switchtotag = true } },
     { rule = { class = "Firefox", role = "Manager" },
       properties = { floating = true } },
-
 
     -- Tag 4:prog
     { rule = { class = "Emacs" },
