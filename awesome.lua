@@ -447,6 +447,7 @@ awful.rules.rules = {
       properties = { border_width = beautiful.border_width,
                      border_color = beautiful.border_normal,
                      focus   = true,
+                     floating= true,
                      keys    = clientkeys,
                      buttons = clientbuttons } },
     { rule = { class = "MPlayer" },
@@ -473,34 +474,41 @@ awful.rules.rules = {
     { rule = { class = "Gcalctool" },
       properties = { floating = true } },
 
+    -- Not floating
+    { rule = { class = "Gnome-terminal" },
+      properties = { floating = false } },
+
+
     -- CTAF
     -- Tag 1:www
     { rule = { class = "Epiphany-browser" },
-      properties = { tag = tags[1][1], switchtotag = true } },
+      properties = { floating = false, tag = tags[1][1], switchtotag = true } },
     { rule = { class = "Epiphany-browser", role = "epiphany-extension-manager" },
       properties = { floating = true } },
     { rule = { class = "Epiphany-browser", role = "epiphany-download-manager" },
       properties = { floating = true } },
 
     { rule = { class = "Firefox" },
-      properties = { tag = tags[1][1], switchtotag = true } },
+      properties = { floating = false, tag = tags[1][1], switchtotag = true } },
     { rule = { class = "Firefox", role = "Manager" },
       properties = { floating = true } },
 
     -- Tag 4:prog
     { rule = { class = "Emacs" },
-      properties = { tag = tags[1][4], switchtotag = true } },
+      properties = { floating = false, tag = tags[1][4], switchtotag = true } },
     { rule = { class = "Gitk" },
-      properties = { tag = tags[1][4], switchtotag = true } },
+      properties = { floating = false, tag = tags[1][4], switchtotag = true } },
     { rule = { class = "Git-gui" },
-      properties = { tag = tags[1][4], switchtotag = true } },
+      properties = { floating = false, tag = tags[1][4], switchtotag = true } },
+    { rule = { class = "Meld" },
+      properties = { floating = false, tag = tags[1][4], switchtotag = true } },
 
 
     -- Tag 5:im
     { rule = { class = "Pidgin" },
-      properties = { tag = tags[1][5], floating = true, ontop = true } },
+      properties = { floating = true, tag = tags[1][5], ontop = true } },
     { rule = { name = "Buddy List" },
-      properties = { tag = tags[1][5], floating = true, ontop = true } },
+      properties = { floating = true, tag = tags[1][5], ontop = true } },
 
     -- Tag 6:misc
     { rule = { class = "Evince" },
