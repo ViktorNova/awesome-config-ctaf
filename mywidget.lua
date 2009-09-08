@@ -48,7 +48,7 @@ thermalwidget  = widget({ type = "textbox", name = "thermalwidget" })
 cpuwidget      = awful.widget.graph({ layout = awful.widget.layout.horizontal.rightleft })
 
 -- CPU graph properties
-cpuwidget:set_width(30)
+cpuwidget:set_width(50)
 cpuwidget:set_scale(false)
 cpuwidget:set_max_value(100)
 cpuwidget:set_background_color(beautiful.fg_off_widget)
@@ -82,7 +82,10 @@ memwidget:set_gradient_colors({
     beautiful.fg_widget })
 awful.widget.layout.margins[memwidget.widget] = { top = 2, bottom = 2 }
 -- Register widget
-vicious.register(memwidget, vicious.widgets.mem, "$1", 4)
+vicious.register(memwidget, vicious.widgets.mem, "$1", 10)
+
+--memtwidget     = widget({ type = "textbox", name = "batwidget" })
+--vicious.register(memtwidget, vicious.widgets.mem, "$1-$2-$3-$4", 1)
 -- }}}
 
 
