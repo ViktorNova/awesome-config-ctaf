@@ -12,6 +12,8 @@ require("ctafconf")
 require("teardrop")
 require("dbg")
 require("mywidget")
+require("awful.tab")
+require("awful.widget.tablist")
 -- ECTAF
 
 -- {{{ Variable definitions
@@ -185,7 +187,7 @@ for s = 1, screen.count() do
                                           end, mytasklist.buttons)
 
     -- Create the wibox
-    mywibox[s] = awful.wibox({ position = "top", screen = s })
+    mywibox[s] = awful.wibox({ position = "top", screen = s, height = 14 })
     -- Add widgets to the wibox - order matters
 
     -- CTAF
@@ -231,6 +233,10 @@ root.buttons(awful.util.table.join(
     awful.button({ }, 5, awful.tag.viewprev)
 ))
 -- }}}
+-- CTAF
+gmrun     = teardrop("gmrun"         , "top"   )
+gnometerm = teardrop("gnome-terminal", "bottom")
+-- ECTAF
 
 -- {{{ Key bindings
 globalkeys = awful.util.table.join(
@@ -293,10 +299,9 @@ globalkeys = awful.util.table.join(
                                                      awful.util.spawn, awful.completion.shell,
                                                      awful.util.getdir("cache") .. "/history")
                                 end),
-
     awful.key({ modkey }, "F2", function() awful.util.spawn(terminal, true, get_screen().index)                 end),
-    awful.key({ modkey }, "F3", function() teardrop.toggle("gmrun", 1, 0.10) end),
-    awful.key({ modkey }, "d", function() teardrop.toggle("gnome-terminal", 0, 0.50) end),
+    awful.key({ modkey }, "F3", function() gmrun:toggle() end),
+    awful.key({ modkey }, "d", function() gnometerm:toggle() end),
 
     awful.key({ modkey }, "F4", function ()
                                     awful.prompt.run({ prompt = "Run Lua code: " },
@@ -469,7 +474,7 @@ awful.rules.rules = {
 --     { rule = { class = "Gedit" },
 --       properties = { floating = true, width = 600, height = 600, x = 420, y = 420 } },
     { rule = { class = "Gedit" },
-      properties = { floating = true } },
+      properties = { floating = true, width = "90%", y = "50", placement = "centerx" } },
 
     { rule = { class = "Gcalctool" },
       properties = { floating = true } },
@@ -507,14 +512,18 @@ awful.rules.rules = {
     -- Tag 5:im
     { rule = { class = "Pidgin" },
       properties = { floating = true, tag = tags[1][5], ontop = true } },
+    { rule = { role = "buddy_list" },
+      properties = { floating = true, tag = tags[1][5], ontop = true } },
     { rule = { name = "Buddy List" },
       properties = { floating = true, tag = tags[1][5], ontop = true } },
 
     -- Tag 6:misc
     { rule = { class = "Evince" },
-      properties = { tag = tags[1][6], switchtotag = true } },
+      properties = { tag = tags[1][6], switchtotag = true, floating = false } },
     { rule = { class = "Totem" },
-      properties = { tag = tags[1][6], switchtotag = true } },
+      properties = { tag = tags[1][6], switchtotag = true, floating = false } },
+    { rule = { class = "Nautilus" },
+      properties = { tag = tags[1][6], switchtotag = true, floating = false } },
 
 
     -- ECTAF
@@ -538,7 +547,7 @@ client.add_signal("manage", function (c, startup)
                                            return awful.widget.tablist.label.currenttab(c, s)
                           end, mytasklist.buttons, c)
 
-    awful.titlebar.add(c, { modkey = modkey, widget = {mytab} })
+    awful.titlebar.add(c, { modkey = modkey, widget = {mytab}, height = 14 })
 --   -- Add a titlebar to each client if enabled globaly
 --     if use_titlebar then
 --         awful.titlebar.add(c, { modkey = modkey })
@@ -573,7 +582,7 @@ client.add_signal("manage", function (c, startup)
     awful.client.setslave(c)
 
     -- New floating windows:
-    awful.placement.no_offscreen(c)
+    --awful.placement.no_offscreen(c)
     -- ECTAF
 end)
 
