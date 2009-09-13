@@ -9,7 +9,7 @@ require("naughty")
 
 -- CTAF
 require("ctafconf")
-require("teardrop")
+require("runorraise")
 require("dbg")
 require("mywidget")
 require("awful.tab")
@@ -234,8 +234,21 @@ root.buttons(awful.util.table.join(
 ))
 -- }}}
 -- CTAF
-gmrun     = teardrop("gmrun"         , "top"   )
-gnometerm = teardrop("gnome-terminal", "bottom")
+gmrun     = awful.runorraise("gmrun" , 1, {
+                                 ontop       = true,
+                                 above       = true,
+                                 sticky      = false,
+                                 floating    = true,
+                                 skip_taskbar= true,
+                                 width       = "90%",
+                                 height      = "50%",
+                                 placement   = "centered",
+                             })
+gnometerm = awful.runorraise("gnome-terminal", 1, {
+                                 append      = true,
+                                 sticky      = false,
+                                 tag         = tags[1][4],
+                             })
 -- ECTAF
 
 -- {{{ Key bindings
@@ -300,8 +313,8 @@ globalkeys = awful.util.table.join(
                                                      awful.util.getdir("cache") .. "/history")
                                 end),
     awful.key({ modkey }, "F2", function() awful.util.spawn(terminal, true, get_screen().index)                 end),
-    awful.key({ modkey }, "F3", function() gmrun:toggle() end),
-    awful.key({ modkey }, "d", function() gnometerm:toggle() end),
+    awful.key({ modkey }, "F3", function() gmrun:toggle()     end),
+    awful.key({ modkey }, "d",  function() gnometerm:toggle() end),
 
     awful.key({ modkey }, "F4", function ()
                                     awful.prompt.run({ prompt = "Run Lua code: " },

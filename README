@@ -1,0 +1,6 @@
+the config need vicious:
+git clone http://sysphere.org/~anrxc/local/scr/sources/vicious/vicious.git vicious
+
+optional need:
+url = git://github.com/terceiro/awesome-freedesktop.git
+
