@@ -6,31 +6,35 @@ require("awful.rules")
 require("beautiful")
 -- Notification library
 require("naughty")
-
 -- CTAF
 require("ctafconf")
 require("runorraise")
 require("dbg")
 require("mywidget")
-require("awful.tab")
-require("awful.widget.tablist")
+
+use_tab = false
+if use_tab then
+  require("awful.tab")
+  require("awful.widget.tablist")
+end
 -- ECTAF
 
 -- {{{ Variable definitions
+-- Themes define colours, icons, and wallpapers
+beautiful.init("@AWESOME_THEMES_PATH@/default/theme.lua")
+
 -- This is used later as the default terminal and editor to run.
 terminal = "xterm"
+
 -- CTAF
 terminal = "gnome-terminal"
 
 -- Zenburn theme
 beautiful.init("/usr/share/awesome/themes/zenburn/theme.lua")
-
 -- ECTAF
 
 editor = os.getenv("EDITOR") or "nano"
 editor_cmd = terminal .. " -e " .. editor
-
-
 
 -- Default modkey.
 -- Usually, Mod4 is the key with a logo between Control and Alt.
@@ -121,7 +125,6 @@ mylauncher = awful.widget.launcher({ image = image(beautiful.awesome_icon),
 -- Create a textclock widget
 mytextclock = awful.widget.textclock({ align = "right" })
 
-
 -- Create a systray
 mysystray = widget({ type = "systray" })
 
@@ -166,7 +169,7 @@ mytasklist.buttons = awful.util.table.join(
 
 for s = 1, screen.count() do
     -- Create a promptbox for each screen
-    mypromptbox[s] = awful.widget.prompt({ layout = awful.widget.layout.horizontal.leftright })
+    mypromptbox[s] = awful.widget.prompt()
     -- Create an imagebox widget which will contains an icon indicating which layout we're using.
     -- We need one layoutbox per screen.
     mylayoutbox[s] = awful.widget.layoutbox(s)
@@ -176,15 +179,22 @@ for s = 1, screen.count() do
                            awful.button({ }, 4, function () awful.layout.inc(layouts, 1) end),
                            awful.button({ }, 5, function () awful.layout.inc(layouts, -1) end)))
     -- Create a taglist widget
-    mytaglist[s] = awful.widget.taglist(s, awful.widget.taglist.label.all, mytaglist.buttons)
+    mytaglist[s] = awful.widget.taglist(s, awful.widget.taglist.filter.all, mytaglist.buttons)
 
     -- Create a tasklist widget
     mytasklist[s] = awful.widget.tasklist(function(c)
                                               -- CTAF
                               	              -- return awful.widget.tasklist.label.currenttags(c, s)
-                                              return awful.widget.tasklist.label.currenttags(c, s, { display_tab = true })
+
+                                             if use_tab then
+                                                return awful.widget.tasklist.filter.currenttags(c, s, { display_tab = true })
+                                              else
+                              	                return awful.widget.tasklist.filter.currenttags(c, s)
+                                              end
                                               -- ECTAF
                                           end, mytasklist.buttons)
+   mytasklist[s] = awful.widget.tasklist(s, awful.widget.tasklist.filter.currenttags, mytasklist.buttons)
+
 
     -- Create the wibox
     mywibox[s] = awful.wibox({ position = "top", screen = s, height = 14 })
@@ -196,31 +206,35 @@ for s = 1, screen.count() do
 --             mylauncher,
 --             mytaglist[s],
 --             mypromptbox[s],
---             layout = awful.widget.layout.horizontal.leftright
+--             layout = awful.widget.layout.horizontal.rightleft
 --         },
 --         mylayoutbox[s],
 --         mytextclock,
 --         s == 1 and mysystray or nil,
 --         mytasklist[s],
---         layout = awful.widget.layout.horizontal.rightleft
+--         layout = awful.widget.layout.horizontal.leftright
 --     }
-    mywibox[s].widgets = {{
-                              mylauncher,
-                              mytaglist[s],
-                              mypromptbox[s],
-                              layout = awful.widget.layout.horizontal.leftright
-                          },
-                          mylayoutbox[s],
-                          mytextclock,
-                          s == 1 and mysystray or nil,
-                          separator, volbarwidget, volicon,
-                          separator, batbarwidget, batwidget,
-                          separator, memwidget,
-                          cpuwidget,
-                          separator,
-                          mytasklist[s],
-                          layout = awful.widget.layout.horizontal.rightleft
-                      }
+
+    -- Create a table with widgets that go to the right
+
+    mywibox[s].widgets = {
+       {
+          mylauncher,
+          mytaglist[s],
+          mypromptbox[s],
+          layout = awful.widget.layout.horizontal.leftright
+       },
+       mytextclock,
+       s == 1 and mysystray or nil,
+       separator, volbarwidget, volicon,
+       separator, batbarwidget, batwidget,
+       separator, memwidget,
+       cpuwidget,
+       separator,
+       mylayoutbox[s],
+          mytasklist[s],
+       layout = awful.widget.layout.horizontal.leftright
+    }
 
     -- ECTAF
 end
@@ -369,12 +383,13 @@ globalkeys = awful.util.table.join(
 
     --- tab manipulation
     -- remove a client from a tag
-    awful.key({ modkey, "Shift"   }, "y", awful.tab.remove),
+    --if use_tab then
+    --awful.key({ modkey, "Shift"   }, "y", awful.tab.remove),
     -- cycle through tab
-    awful.key({ modkey,           }, "y", awful.tab.cycle),
-    awful.key({ modkey, "Control" }, "y", awful.tab.add_next_client),
+    --awful.key({ modkey,           }, "y", awful.tab.cycle),
+    --awful.key({ modkey, "Control" }, "y", awful.tab.add_next_client),
     -- create a tab from all marked client
-    awful.key({ modkey, 'Shift'   }, "t", awful.tab.create_from_marked),
+    --awful.key({ modkey, 'Shift'   }, "t", awful.tab.create_from_marked),
 
     -- ECTAF
 
@@ -553,30 +568,30 @@ client.add_signal("manage", function (c, startup)
         c.screen = mouse.screen
     end
 
-    -- Add a titlebar
-    -- awful.titlebar.add(c, { modkey = modkey })
-    -- CTAF
-    local mytab = awful.widget.tablist(function(c)
-                                           return awful.widget.tablist.label.currenttab(c, s)
-                          end, mytasklist.buttons, c)
+--     -- Add a titlebar
+--     -- awful.titlebar.add(c, { modkey = modkey })
+--     -- CTAF
+--     local mytab = awful.widget.tablist(function(c)
+--                                            return awful.widget.tablist.label.currenttab(c, s)
+--                           end, mytasklist.buttons, c)
 
-    awful.titlebar.add(c, { modkey = modkey, widget = {mytab}, height = 14 })
---   -- Add a titlebar to each client if enabled globaly
---     if use_titlebar then
---         awful.titlebar.add(c, { modkey = modkey })
---     -- Floating clients always have titlebars
---     elseif awful.client.floating.get(c)
---         or awful.layout.get(c.screen) == awful.layout.suit.floating then
---             if not c.fullscreen then
---                 if not c.titlebar and c.class ~= "Xmessage" then
---                     awful.titlebar.add(c, { modkey = modkey })
---                 end
---                 -- Floating clients are always on top
---                 c.above = true
---             end
---     end
+--     awful.titlebar.add(c, { modkey = modkey, widget = {mytab}, height = 14 })
+-- --   -- Add a titlebar to each client if enabled globaly
+-- --     if use_titlebar then
+-- --         awful.titlebar.add(c, { modkey = modkey })
+-- --     -- Floating clients always have titlebars
+-- --     elseif awful.client.floating.get(c)
+-- --         or awful.layout.get(c.screen) == awful.layout.suit.floating then
+-- --             if not c.fullscreen then
+-- --                 if not c.titlebar and c.class ~= "Xmessage" then
+-- --                     awful.titlebar.add(c, { modkey = modkey })
+-- --                 end
+-- --                 -- Floating clients are always on top
+-- --                 c.above = true
+-- --             end
+-- --     end
 
-    -- ECTAF
+--     -- ECTAF
 
     -- Enable sloppy focus
 --     c:add_signal("mouse::enter", function(c)
@@ -613,8 +628,9 @@ client.add_signal("new", function (c)
     end)
 end)
 
+if use_tab then
 autotab_start()
-
+end
 -- ECTAF
 
 client.add_signal("focus", function(c) c.border_color = beautiful.border_focus end)
